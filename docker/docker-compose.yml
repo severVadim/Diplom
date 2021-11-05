@@ -1,0 +1,50 @@
+version: '3'
+
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  cassandra:
+    image: cassandra:3.11.11
+    container_name: cassandra
+    environment:
+      - CASSANDRA_KEYSPACE=TEST
+    networks:
+      - default
+    ports:
+      - "9042:9042"
+    volumes:
+      - ./out/cassandra_data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD", "cqlsh", "-u cassandra", "-p cassandra" ,"-e describe keyspaces"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '8G'
+
+  cassandra-load-keyspace:
+    container_name: cassandra-load-keyspace
+    image: cassandra:3.11.11
+    depends_on:
+      cassandra:
+        condition: service_healthy
+    volumes:
+      - ./docker-entrypoint-initdb.d/init.cql:/schema.cql
+    command: /bin/bash -c "echo loading cassandra keyspace && cqlsh cassandra -f /schema.cql"
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - default
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '8G'
+

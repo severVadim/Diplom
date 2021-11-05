@@ -1,0 +1,19 @@
+server:
+  port: 8180
+
+
+cassandra:
+  keyspace: new_k
+  host: localhost
+  port: 9042
+  username: cassandra
+  password: cassandra
+spring:
+  data:
+    cassandra:
+      local-datacenter: DC1
+      keyspace-name: new_k
+      contact-points: locahost
+      port: 9042
+      username: cassandra
+      password: cassandra
