@@ -1,4 +1,4 @@
-package com.diplom.model;
+package com.diplom.model.api;
 
 
 import lombok.AllArgsConstructor;

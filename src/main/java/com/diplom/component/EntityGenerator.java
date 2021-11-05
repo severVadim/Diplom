@@ -1,9 +1,6 @@
 package com.diplom.component;
 
-import com.diplom.model.Operation;
-import com.diplom.model.RequestModel;
-import com.diplom.model.ResponseMetrics;
-import com.diplom.repository.cassandra.CassandraDao;
+import com.diplom.model.api.RequestModel;
 import com.diplom.util.JsonBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

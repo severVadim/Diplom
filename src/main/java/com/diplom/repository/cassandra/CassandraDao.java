@@ -2,20 +2,16 @@ package com.diplom.repository.cassandra;
 
 
 import com.datastax.driver.core.*;
-import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
-import com.datastax.oss.driver.api.querybuilder.insert.JsonInsert;
 import com.diplom.model.DB;
-import com.diplom.model.DBResponse;
-import com.diplom.model.cassandra.Column;
+import com.diplom.model.api.DBResponse;
+import com.diplom.model.api.RequestModel;
 import com.diplom.repository.RepositoryService;
-import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.*;
+
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -40,7 +36,7 @@ public class CassandraDao implements RepositoryService {
     }
 
     @Override
-    public void createTable(List<Column> columns) {
+    public void createTable(List<RequestModel.Column> columns) {
         String queryDynamicBuilder = createTableQueryDynamicBuilder(columns);
         session.execute(queryDynamicBuilder);
         session.getState();
@@ -58,18 +54,18 @@ public class CassandraDao implements RepositoryService {
     }
 
 
-    private String createTableQueryDynamicBuilder(List<Column> columns) {
+    private String createTableQueryDynamicBuilder(List<RequestModel.Column> columns) {
         StringBuilder builder = new StringBuilder("CREATE TABLE IF NOT EXISTS test_table (");
         builder.append(columns
                 .stream()
                 .map(column -> column.getName() + " " + column.getType().getType())
                 .collect(Collectors.joining(", ")));
-        List<Column> primaryColumns = columns.stream().filter(Column::isPrimaryKey).collect(Collectors.toList());
+        List<RequestModel.Column> primaryColumns = columns.stream().filter(RequestModel.Column::isPrimaryKey).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(primaryColumns)) {
             builder.append(", primary key (");
             builder.append(primaryColumns
                     .stream()
-                    .map(Column::getName)
+                    .map(RequestModel.Column::getName)
                     .collect(Collectors.joining(", ")));
             builder.append(")");
         }

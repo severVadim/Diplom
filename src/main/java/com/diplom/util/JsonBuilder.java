@@ -1,11 +1,10 @@
 package com.diplom.util;
 
-import com.diplom.model.RequestModel;
+import com.diplom.model.api.RequestModel;
 import lombok.SneakyThrows;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;

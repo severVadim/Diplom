@@ -2,12 +2,12 @@ package com.diplom.controller;
 
 
 import com.diplom.model.*;
+import com.diplom.model.api.ConfigurationModel;
+import com.diplom.model.api.RequestPayload;
+import com.diplom.model.api.ResponseMetrics;
 import com.diplom.repository.RepositoryServiceExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor

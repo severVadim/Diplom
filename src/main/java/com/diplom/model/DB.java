@@ -2,7 +2,9 @@ package com.diplom.model;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,5 +21,13 @@ public enum DB {
         return Arrays.stream(DB.values())
                 .map(dbEnum -> new DBModel(dbEnum.name(), dbEnum.getDb()))
                 .collect(Collectors.toList());
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class DBModel {
+        private String guid;
+        private String name;
     }
 }

@@ -1,7 +1,8 @@
-package com.diplom.model;
+package com.diplom.model.api;
 
-import com.diplom.model.cassandra.Column;
+import com.diplom.model.Type;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,15 @@ public class RequestModel{
         private float fromValue;
         private float toValue;
         private List<Object> values;
+    }
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Column {
+        private String name;
+        private Type type;
+        private boolean primaryKey;
     }
 
 }

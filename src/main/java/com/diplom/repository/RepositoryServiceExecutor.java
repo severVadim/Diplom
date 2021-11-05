@@ -2,7 +2,10 @@ package com.diplom.repository;
 
 import com.diplom.component.EntityGenerator;
 import com.diplom.model.*;
-import com.diplom.model.cassandra.Column;
+import com.diplom.model.api.DBResponse;
+import com.diplom.model.api.RequestModel;
+import com.diplom.model.api.RequestPayload;
+import com.diplom.model.api.ResponseMetrics;
 import com.diplom.repository.cassandra.CassandraDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +38,7 @@ public class RepositoryServiceExecutor {
     }
 
 
-    private List<Column> getColumns(List<RequestModel> requestModels){
+    private List<RequestModel.Column> getColumns(List<RequestModel> requestModels){
         return requestModels.stream().map(RequestModel::getColumn).collect(Collectors.toList());
     }
 }
