@@ -1,5 +1,6 @@
 package com.diplom.model.cassandra;
 
+import com.diplom.model.Type;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

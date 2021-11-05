@@ -5,6 +5,7 @@ import com.datastax.driver.core.*;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.datastax.oss.driver.api.querybuilder.insert.JsonInsert;
+import com.diplom.model.DB;
 import com.diplom.model.DBResponse;
 import com.diplom.model.cassandra.Column;
 import com.diplom.repository.RepositoryService;
@@ -51,6 +52,11 @@ public class CassandraDao implements RepositoryService {
         return  null;
     }
 
+    @Override
+    public String getDataBase() {
+        return DB.APACHE_CASSANDRA.getDb();
+    }
+
 
     private String createTableQueryDynamicBuilder(List<Column> columns) {
         StringBuilder builder = new StringBuilder("CREATE TABLE IF NOT EXISTS test_table (");
@@ -70,6 +76,4 @@ public class CassandraDao implements RepositoryService {
         builder.append(");");
         return builder.toString();
     }
-
-
 }

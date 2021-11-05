@@ -10,4 +10,5 @@ import java.util.List;
 public interface RepositoryService {
     void createTable(List<Column> columns);
     DBResponse fillTable (List<String> entities);
+    String getDataBase();
 }
