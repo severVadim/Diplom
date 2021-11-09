@@ -21,7 +21,7 @@ public class RequestModel{
     public static class ValueRange {
         private float fromValue;
         private float toValue;
-        private List<Object> values;
+        private List<String> values;
     }
     @Data
     @Builder

@@ -10,7 +10,7 @@ services:
     image: cassandra:3.11.11
     container_name: cassandra
     environment:
-      - CASSANDRA_KEYSPACE=TEST
+      - CASSANDRA_KEYSPACE=new_k
     networks:
       - default
     ports:
@@ -37,14 +37,15 @@ services:
     volumes:
       - ./docker-entrypoint-initdb.d/init.cql:/schema.cql
     command: /bin/bash -c "echo loading cassandra keyspace && cqlsh cassandra -f /schema.cql"
-  redis:
-    image: redis:latest
-    container_name: redis
-    networks:
-      - default
-    deploy:
-      resources:
-        limits:
-          cpus: '2'
-          memory: '8G'
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - /home/barry/mongodb/database:/data/db
+    ports:
+      - 27017:27017
+    restart: unless-stopped
 

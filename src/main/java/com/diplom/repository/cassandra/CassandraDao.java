@@ -1,7 +1,9 @@
 package com.diplom.repository.cassandra;
 
 
-import com.datastax.driver.core.*;
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Session;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.diplom.model.DB;
 import com.diplom.model.api.DBResponse;
@@ -44,13 +46,40 @@ public class CassandraDao implements RepositoryService {
 
     @Override
     public DBResponse fillTable(List<String> entities) {
+        long time = System.currentTimeMillis();
         entities.forEach(entity -> session.execute(QueryBuilder.insertInto(KEY_SPACE, TABLE).json(entity).build().getQuery()));
-        return  null;
+        return DBResponse.builder()
+                .dbName(DB.valueOf(getDataBase()).getDb())
+                .numberOfEntities(entities.size())
+                .responseTime(System.currentTimeMillis() - time).build();
     }
 
     @Override
     public String getDataBase() {
-        return DB.APACHE_CASSANDRA.getDb();
+        return DB.APACHE_CASSANDRA.name();
+    }
+
+
+    @Override
+    public DBResponse getWithLimit(Integer limit) {
+        long time = System.currentTimeMillis();
+        ResultSet result =
+                session.execute(String.format("SELECT * FROM %s.%s LIMIT %s;", KEY_SPACE, TABLE, limit));
+        return DBResponse.builder()
+                .dbName(DB.valueOf(getDataBase()).getDb())
+                .numberOfEntities(result.all().size())
+                .responseTime(System.currentTimeMillis() - time).build();
+    }
+
+    @Override
+    public DBResponse getWithStatement(String statement) {
+        long time = System.currentTimeMillis();
+        ResultSet result =
+                session.execute(String.format("SELECT * FROM %s.%s %s", KEY_SPACE, TABLE, statement));
+        return DBResponse.builder()
+                .dbName(DB.valueOf(getDataBase()).getDb())
+                .numberOfEntities(result.all().size())
+                .responseTime(System.currentTimeMillis() - time).build();
     }
 
 

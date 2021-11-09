@@ -17,3 +17,7 @@ spring:
       port: 9042
       username: cassandra
       password: cassandra
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test

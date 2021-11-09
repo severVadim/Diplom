@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class DBResponse {
     private String dbName;
-    private Long numberOfEntities;
+    private int numberOfEntities;
     private Long responseTime;
 }
