@@ -13,11 +13,11 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Getter
 public enum DB {
-    APACHE_CASSANDRA ("Apache Cassandra"),
+    APACHE_CASSANDRA("Apache Cassandra"),
     MONGODB("MongoDB");
     private String db;
 
-    public static List<DBModel> getDBModels(){
+    public static List<DBModel> getDBModels() {
         return Arrays.stream(DB.values())
                 .map(dbEnum -> new DBModel(dbEnum.name(), dbEnum.getDb()))
                 .collect(Collectors.toList());

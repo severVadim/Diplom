@@ -9,9 +9,14 @@ import java.util.List;
 
 public interface RepositoryService {
     void createTable(List<RequestModel.Column> columns);
-    DBResponse fillTable (List<String> entities);
+
+    DBResponse fillTable(List<String> entities);
+
     String getDataBase();
+
     DBResponse getWithLimit(Integer limit);
+
     DBResponse getWithStatement(StatementModel statement);
+
     String getExpression(StatementExpresion statementExpresion);
 }

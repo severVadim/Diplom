@@ -1,32 +1,31 @@
 package com.diplom.util;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Random;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomValueGenerator {
 
     public static final Random RANDOM = new Random();
 
-    public static String getRandomString(List<String> values){
+    public static String getRandomString(List<String> values) {
         return values.get(RANDOM.nextInt(values.size()));
     }
 
-    public static boolean getRandomBoolean(){
+    public static boolean getRandomBoolean() {
         return RANDOM.nextBoolean();
     }
 
-    public static long getRandomLong(float valueFrom, float valueTo){
-        return  (long)valueFrom + (long) (Math.random() * (valueTo - valueFrom));
+    public static long getRandomLong(float valueFrom, float valueTo) {
+        return (long) valueFrom + (long) (Math.random() * (valueTo - valueFrom));
     }
 
-    public static float getRandomFloat(float valueFrom, float valueTo){
-        return Float.parseFloat(String.format("%.2f",valueFrom + RANDOM.nextFloat() * (valueTo - valueFrom)));
+    public static float getRandomFloat(float valueFrom, float valueTo) {
+        return Float.parseFloat(String.format("%.2f", valueFrom + RANDOM.nextFloat() * (valueTo - valueFrom)));
     }
 
-    public static String getRandomDate(float valueFrom, float valueTo){
+    public static String getRandomDate(float valueFrom, float valueTo) {
         return randomDate((long) valueFrom, (long) valueTo);
     }
 

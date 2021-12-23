@@ -2,7 +2,6 @@ package com.diplom.model;
 
 import com.diplom.model.api.RequestModel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

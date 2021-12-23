@@ -38,8 +38,8 @@ public class JsonBuilder {
         }
     }
 
-    public static String addSingleQuotes(String value, Type type){
-        if (type.equals(Type.DATE) || type.equals(Type.TEXT)){
+    public static String addSingleQuotes(String value, Type type) {
+        if (type.equals(Type.DATE) || type.equals(Type.TEXT)) {
             return String.format("'%s'", value);
         }
         return value;

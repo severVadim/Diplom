@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Getter
-public class CassandraConfiguration{
+public class CassandraConfiguration {
     @Value("${cassandra.keyspace}")
     private String keyspaceName;
     @Value("${cassandra.host}")

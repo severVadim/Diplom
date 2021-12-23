@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestModel{
+public class RequestModel {
     private ValueRange valueRange;
     private Column column;
 
@@ -23,6 +23,7 @@ public class RequestModel{
         private float toValue;
         private List<String> values;
     }
+
     @Data
     @Builder
     @AllArgsConstructor

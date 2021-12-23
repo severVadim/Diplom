@@ -14,16 +14,16 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class MongoDbDao implements RepositoryService{
+public class MongoDbDao implements RepositoryService {
 
     private MongoCollection<Document> mycollection;
 
@@ -47,7 +47,7 @@ public class MongoDbDao implements RepositoryService{
         long time = System.currentTimeMillis();
         mycollection.drop();
         mycollection.insertMany(entities.stream().map(Document::parse).collect(Collectors.toList()));
-        return  DBResponse.builder()
+        return DBResponse.builder()
                 .dbName(DB.valueOf(getDataBase()).getDb())
                 .numberOfEntities(entities.size())
                 .responseTime(System.currentTimeMillis() - time).build();
@@ -63,7 +63,7 @@ public class MongoDbDao implements RepositoryService{
         long time = System.currentTimeMillis();
         MongoCursor<Document> iterator = mycollection.find().limit(limit).iterator();
         int i = 0;
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             i++;
             iterator.next();
         }
@@ -79,7 +79,7 @@ public class MongoDbDao implements RepositoryService{
         whereQuery.put(statement.getRequestModel().getColumn().getName(), new BasicDBObject(getExpression(statement.getStatementExpresion()), statement.getValue()));
         MongoCursor<Document> iterator = mycollection.find(whereQuery).iterator();
         int i = 0;
-        while(iterator.hasNext()){
+        while (iterator.hasNext()) {
             i++;
             iterator.next();
         }
@@ -90,7 +90,7 @@ public class MongoDbDao implements RepositoryService{
 
     @Override
     public String getExpression(StatementExpresion statementExpresion) {
-        if (statementExpresion.equals(StatementExpresion.EQUAL)){
+        if (statementExpresion.equals(StatementExpresion.EQUAL)) {
             return "$eq";
         }
         return "$gt";

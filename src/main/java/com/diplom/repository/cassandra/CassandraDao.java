@@ -81,7 +81,7 @@ public class CassandraDao implements RepositoryService {
         long time = System.currentTimeMillis();
         ResultSet result =
                 session.execute(String.format("SELECT * FROM %s.%s WHERE %s %s %s allow filtering;", KEY_SPACE, TABLE,
-                statement.getRequestModel().getColumn().getName(), getExpression(statement.getStatementExpresion()),
+                        statement.getRequestModel().getColumn().getName(), getExpression(statement.getStatementExpresion()),
                         addSingleQuotes(statement.getValue().toString(), statement.getRequestModel().getColumn().getType())));
         return DBResponse.builder()
                 .dbName(DB.valueOf(getDataBase()).getDb())
@@ -109,8 +109,8 @@ public class CassandraDao implements RepositoryService {
         return builder.toString();
     }
 
-    public String getExpression (StatementExpresion statementExpresion){
-        if (statementExpresion.equals(StatementExpresion.EQUAL)){
+    public String getExpression(StatementExpresion statementExpresion) {
+        if (statementExpresion.equals(StatementExpresion.EQUAL)) {
             return "=";
         }
         return ">";
