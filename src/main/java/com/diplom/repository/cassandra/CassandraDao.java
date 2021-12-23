@@ -6,6 +6,8 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import com.diplom.model.DB;
+import com.diplom.model.StatementExpresion;
+import com.diplom.model.StatementModel;
 import com.diplom.model.api.DBResponse;
 import com.diplom.model.api.RequestModel;
 import com.diplom.repository.RepositoryService;
@@ -15,6 +17,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.diplom.util.JsonBuilder.addSingleQuotes;
 
 
 @Component
@@ -47,6 +51,7 @@ public class CassandraDao implements RepositoryService {
     @Override
     public DBResponse fillTable(List<String> entities) {
         long time = System.currentTimeMillis();
+        session.execute(String.format("TRUNCATE %s.%s", KEY_SPACE, TABLE));
         entities.forEach(entity -> session.execute(QueryBuilder.insertInto(KEY_SPACE, TABLE).json(entity).build().getQuery()));
         return DBResponse.builder()
                 .dbName(DB.valueOf(getDataBase()).getDb())
@@ -72,10 +77,12 @@ public class CassandraDao implements RepositoryService {
     }
 
     @Override
-    public DBResponse getWithStatement(String statement) {
+    public DBResponse getWithStatement(StatementModel statement) {
         long time = System.currentTimeMillis();
         ResultSet result =
-                session.execute(String.format("SELECT * FROM %s.%s %s", KEY_SPACE, TABLE, statement));
+                session.execute(String.format("SELECT * FROM %s.%s WHERE %s %s %s allow filtering;", KEY_SPACE, TABLE,
+                statement.getRequestModel().getColumn().getName(), getExpression(statement.getStatementExpresion()),
+                        addSingleQuotes(statement.getValue().toString(), statement.getRequestModel().getColumn().getType())));
         return DBResponse.builder()
                 .dbName(DB.valueOf(getDataBase()).getDb())
                 .numberOfEntities(result.all().size())
@@ -100,5 +107,12 @@ public class CassandraDao implements RepositoryService {
         }
         builder.append(");");
         return builder.toString();
+    }
+
+    public String getExpression (StatementExpresion statementExpresion){
+        if (statementExpresion.equals(StatementExpresion.EQUAL)){
+            return "=";
+        }
+        return ">";
     }
 }

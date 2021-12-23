@@ -1,5 +1,6 @@
 package com.diplom.util;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Random;
 import java.util.List;
@@ -22,7 +23,7 @@ public class RandomValueGenerator {
     }
 
     public static float getRandomFloat(float valueFrom, float valueTo){
-        return valueFrom + RANDOM.nextFloat() * (valueTo - valueFrom);
+        return Float.parseFloat(String.format("%.2f",valueFrom + RANDOM.nextFloat() * (valueTo - valueFrom)));
     }
 
     public static String getRandomDate(float valueFrom, float valueTo){

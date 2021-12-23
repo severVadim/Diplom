@@ -1,8 +1,9 @@
 package com.diplom.service;
 
 import com.diplom.component.EntityGenerator;
-import com.diplom.component.StatementGenerator;
+import com.diplom.component.statement.StatementGenerator;
 import com.diplom.model.ArgumentWrapper;
+import com.diplom.model.StatementModel;
 import com.diplom.model.api.DBResponse;
 import com.diplom.model.api.RequestModel;
 import com.diplom.model.api.RequestPayload;
@@ -41,7 +42,7 @@ public class RepositoryServiceExecutor {
         List<RepositoryService> servicesToUse = requestPayload.getDatabases().stream().map(db -> services.get(db)).collect(Collectors.toList());
         servicesToUse.forEach(services -> services.createTable(getColumns(requestPayload.getRequestModels())));
         ArgumentWrapper argumentWrapper = new ArgumentWrapper(entityGenerator.generateEntities(amount, requestPayload.getRequestModels()),
-                statementGenerator.generateStatements(requestPayload.getRequestModels()));
+                statementGenerator.statementValueGenerator(requestPayload.getRequestModels()));
         List<List<ResponseMetrics>> responseMetrics = METHODS.stream().map(method -> method.apply(argumentWrapper, servicesToUse)).collect(Collectors.toList());
         return responseMetrics.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
@@ -67,13 +68,16 @@ public class RepositoryServiceExecutor {
     }
 
     private static List<ResponseMetrics> executeWithStatement(ArgumentWrapper argumentWrapper, List<RepositoryService> services) {
-        List<String> statements = argumentWrapper.getStatements();
+        List<StatementModel> statements = argumentWrapper.getStatements();
 
         return statements.stream()
-                .map(statement -> ResponseMetrics.builder().operation(String.format("Retrieve entities by statement - %s", statement)).response(services
-                        .stream()
-                        .map(service -> service.getWithStatement(statement))
-                        .collect(Collectors.toList()))
+                .map(statement -> ResponseMetrics.builder()
+                        .operation(String.format("Retrieve entities by filed %s with statement - %s %s", statement.getRequestModel().getColumn().getName(),
+                                statement.getStatementExpresion().name(), statement.getValue()))
+                        .response(services
+                                .stream()
+                                .map(service -> service.getWithStatement(statement))
+                                .collect(Collectors.toList()))
                         .build())
                 .collect(Collectors.toList());
     }

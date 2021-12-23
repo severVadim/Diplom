@@ -1,5 +1,7 @@
 package com.diplom.repository;
 
+import com.diplom.model.StatementExpresion;
+import com.diplom.model.StatementModel;
 import com.diplom.model.api.DBResponse;
 import com.diplom.model.api.RequestModel;
 
@@ -10,5 +12,6 @@ public interface RepositoryService {
     DBResponse fillTable (List<String> entities);
     String getDataBase();
     DBResponse getWithLimit(Integer limit);
-    DBResponse getWithStatement(String statement);
+    DBResponse getWithStatement(StatementModel statement);
+    String getExpression(StatementExpresion statementExpresion);
 }

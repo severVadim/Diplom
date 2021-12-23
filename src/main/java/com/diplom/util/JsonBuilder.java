@@ -1,5 +1,6 @@
 package com.diplom.util;
 
+import com.diplom.model.Type;
 import com.diplom.model.api.RequestModel;
 import lombok.SneakyThrows;
 import org.json.JSONObject;
@@ -37,5 +38,10 @@ public class JsonBuilder {
         }
     }
 
-
+    public static String addSingleQuotes(String value, Type type){
+        if (type.equals(Type.DATE) || type.equals(Type.TEXT)){
+            return String.format("'%s'", value);
+        }
+        return value;
+    }
 }
