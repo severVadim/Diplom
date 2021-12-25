@@ -1,24 +1,27 @@
 package com.diplom.repository.cassandra;
 
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Session;
-import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.driver.core.*;
 import com.diplom.model.DB;
+import com.diplom.model.EntityModel;
 import com.diplom.model.StatementExpresion;
 import com.diplom.model.StatementModel;
 import com.diplom.model.api.DBResponse;
 import com.diplom.model.api.RequestModel;
 import com.diplom.repository.RepositoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.sql.Date;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static com.diplom.util.JsonBuilder.addSingleQuotes;
+import static com.diplom.util.EntityBuilder.addSingleQuotes;
 
 
 @Component
@@ -44,15 +47,22 @@ public class CassandraDao implements RepositoryService {
     @Override
     public void createTable(List<RequestModel.Column> columns) {
         String queryDynamicBuilder = createTableQueryDynamicBuilder(columns);
+        session.execute(String.format("DROP TABLE IF EXISTS %s.%s", KEY_SPACE, TABLE));
         session.execute(queryDynamicBuilder);
         session.getState();
     }
 
     @Override
-    public DBResponse fillTable(List<String> entities) {
-        long time = System.currentTimeMillis();
+    public DBResponse fillTable(List<List<EntityModel>> entities) {
+        int columnNumber = entities.get(0).size();
+        String placeholder = String.join(",", Collections.nCopies(columnNumber, "?"));
+        String columns = columnPlaceHolder(entities.get(0));
+        String query = String.format("INSERT INTO %s.%s (%s) VALUES (%s)", KEY_SPACE, TABLE, columns, placeholder);
+        PreparedStatement preparedInsertExpense = session.prepare(query);
         session.execute(String.format("TRUNCATE %s.%s", KEY_SPACE, TABLE));
-        entities.forEach(entity -> session.execute(QueryBuilder.insertInto(KEY_SPACE, TABLE).json(entity).build().getQuery()));
+
+        long time = System.currentTimeMillis();
+        batches(entities, 100, preparedInsertExpense);
         return DBResponse.builder()
                 .dbName(DB.valueOf(getDataBase()).getDb())
                 .numberOfEntities(entities.size())
@@ -90,8 +100,13 @@ public class CassandraDao implements RepositoryService {
     }
 
 
+    private String columnPlaceHolder(List<EntityModel> entityModel) {
+        return entityModel.stream().map(EntityModel::getFiledName).collect(Collectors.joining(","));
+    }
+
+
     private String createTableQueryDynamicBuilder(List<RequestModel.Column> columns) {
-        StringBuilder builder = new StringBuilder("CREATE TABLE IF NOT EXISTS test_table (");
+        StringBuilder builder = new StringBuilder("CREATE TABLE IF NOT EXISTS " + TABLE + " (");
         builder.append(columns
                 .stream()
                 .map(column -> column.getName() + " " + column.getType().getType())
@@ -109,10 +124,43 @@ public class CassandraDao implements RepositoryService {
         return builder.toString();
     }
 
+    private void executeBatch(List<List<EntityModel>> entities, PreparedStatement preparedInsertExpense) {
+        BatchStatement batchStatement = new BatchStatement(BatchStatement.Type.LOGGED);
+        entities.forEach(entity -> batchStatement.add(preparedInsertExpense.bind(convertToList(entity))));
+        session.execute(batchStatement);
+    }
+
+    public void batches(List<List<EntityModel>> entities, int length, PreparedStatement preparedInsertExpense) {
+        int size = entities.size();
+        int fullChunks = (size - 1) / length;
+        IntStream.range(0, fullChunks + 1).forEach(
+                n -> executeBatch(entities.subList(n * length, n == fullChunks ? size : (n + 1) * length), preparedInsertExpense));
+    }
+
     public String getExpression(StatementExpresion statementExpresion) {
         if (statementExpresion.equals(StatementExpresion.EQUAL)) {
             return "=";
         }
         return ">";
+    }
+
+
+    @SneakyThrows
+    private Object[] convertToList(List<EntityModel> entityModel) {
+        return entityModel.stream().map(model -> {
+            if (model.getValueType().equals(Date.class)) {
+                return convertDate(model.getValue().toString());
+            }
+            return model.getValue();
+        }).toArray();
+    }
+
+    public static LocalDate convertDate(final String date) {
+        String[] arr = date.split("-");
+        if (arr.length != 3)
+            return null;
+        return LocalDate.fromYearMonthDay(Integer.parseInt(arr[0]),
+                Integer.parseInt(arr[1]),
+                Integer.parseInt(arr[2]));
     }
 }

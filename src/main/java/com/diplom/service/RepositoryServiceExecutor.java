@@ -3,6 +3,7 @@ package com.diplom.service;
 import com.diplom.component.EntityGenerator;
 import com.diplom.component.statement.StatementGenerator;
 import com.diplom.model.ArgumentWrapper;
+import com.diplom.model.EntityModel;
 import com.diplom.model.StatementModel;
 import com.diplom.model.api.DBResponse;
 import com.diplom.model.api.RequestModel;
@@ -48,13 +49,13 @@ public class RepositoryServiceExecutor {
     }
 
     private static List<ResponseMetrics> executeCreation(ArgumentWrapper argumentWrapper, List<RepositoryService> services) {
-        List<String> entities = argumentWrapper.getEntities();
+        List<List<EntityModel>> entities = argumentWrapper.getEntities();
         List<DBResponse> responses = services.stream().map(service -> service.fillTable(entities)).collect(Collectors.toList());
         return Collections.singletonList(ResponseMetrics.builder().operation(String.format("Create %s entities", entities.size())).response(responses).build());
     }
 
     private static List<ResponseMetrics> executeGetWithLimit(ArgumentWrapper argumentWrapper, List<RepositoryService> services) {
-        List<String> entities = argumentWrapper.getEntities();
+        List<List<EntityModel>> entities = argumentWrapper.getEntities();
         List<Integer> limits = List.of(1, getPercentage(entities.size(), 5),
                 getPercentage(entities.size(), 20),
                 getPercentage(entities.size(), 50));

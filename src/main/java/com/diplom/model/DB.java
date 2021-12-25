@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 @Getter
 public enum DB {
     APACHE_CASSANDRA("Apache Cassandra"),
-    MONGODB("MongoDB");
+    MONGODB("MongoDB"),
+    POSTGRES("Postgres");
     private String db;
 
     public static List<DBModel> getDBModels() {

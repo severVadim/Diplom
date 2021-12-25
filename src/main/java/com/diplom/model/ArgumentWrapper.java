@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArgumentWrapper {
-    private List<String> entities;
+    private List<List<EntityModel>> entities;
     private List<StatementModel> statements;
 }

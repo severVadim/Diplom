@@ -2,30 +2,36 @@ package com.diplom.repository.mongo;
 
 
 import com.diplom.model.DB;
+import com.diplom.model.EntityModel;
 import com.diplom.model.StatementExpresion;
 import com.diplom.model.StatementModel;
 import com.diplom.model.api.DBResponse;
 import com.diplom.model.api.RequestModel;
 import com.diplom.repository.RepositoryService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
+import lombok.SneakyThrows;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class MongoDbDao implements RepositoryService {
 
     private MongoCollection<Document> mycollection;
+    private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     public MongoDbDao() {
@@ -43,10 +49,10 @@ public class MongoDbDao implements RepositoryService {
     }
 
     @Override
-    public DBResponse fillTable(List<String> entities) {
+    public DBResponse fillTable(List<List<EntityModel>> entities) {
         long time = System.currentTimeMillis();
         mycollection.drop();
-        mycollection.insertMany(entities.stream().map(Document::parse).collect(Collectors.toList()));
+        mycollection.insertMany(entitiesToDocuments(entities));
         return DBResponse.builder()
                 .dbName(DB.valueOf(getDataBase()).getDb())
                 .numberOfEntities(entities.size())
@@ -95,4 +101,14 @@ public class MongoDbDao implements RepositoryService {
         }
         return "$gt";
     }
+
+    private List<Document> entitiesToDocuments(List<List<EntityModel>> entities){
+        return entities.stream().map(entity -> Document.parse(convertToJson(entity))).collect(Collectors.toList());
+    }
+
+    @SneakyThrows
+    private String convertToJson(List<EntityModel> entityModel){
+        return OBJECT_MAPPER.writeValueAsString(entityModel.stream().collect(Collectors.toMap(EntityModel::getFiledName, EntityModel::getValue)));
+    }
+
 }
