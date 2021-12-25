@@ -22,9 +22,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -102,12 +100,12 @@ public class MongoDbDao implements RepositoryService {
         return "$gt";
     }
 
-    private List<Document> entitiesToDocuments(List<List<EntityModel>> entities){
+    private List<Document> entitiesToDocuments(List<List<EntityModel>> entities) {
         return entities.stream().map(entity -> Document.parse(convertToJson(entity))).collect(Collectors.toList());
     }
 
     @SneakyThrows
-    private String convertToJson(List<EntityModel> entityModel){
+    private String convertToJson(List<EntityModel> entityModel) {
         return OBJECT_MAPPER.writeValueAsString(entityModel.stream().collect(Collectors.toMap(EntityModel::getFiledName, EntityModel::getValue)));
     }
 

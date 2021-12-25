@@ -9,7 +9,6 @@ import com.diplom.model.StatementModel;
 import com.diplom.model.api.DBResponse;
 import com.diplom.model.api.RequestModel;
 import com.diplom.repository.RepositoryService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
