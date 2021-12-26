@@ -74,27 +74,29 @@ public class CassandraDao implements RepositoryService {
     }
 
 
+    @SneakyThrows
     @Override
     public DBResponse getWithLimit(Integer limit) {
         long time = System.currentTimeMillis();
-        ResultSet result =
-                session.execute(String.format("SELECT * FROM %s.%s LIMIT %s;", KEY_SPACE, TABLE, limit));
+        ResultSetFuture result =
+                session.executeAsync(String.format("SELECT * FROM %s.%s LIMIT %s;", KEY_SPACE, TABLE, limit));
         return DBResponse.builder()
                 .dbName(DB.valueOf(getDataBase()).getDb())
-                .numberOfEntities(result.all().size())
+                .numberOfEntities(result.get().all().size())
                 .responseTime(System.currentTimeMillis() - time).build();
     }
 
+    @SneakyThrows
     @Override
     public DBResponse getWithStatement(StatementModel statement) {
         long time = System.currentTimeMillis();
-        ResultSet result =
-                session.execute(String.format("SELECT * FROM %s.%s WHERE %s %s %s allow filtering;", KEY_SPACE, TABLE,
+        ResultSetFuture result =
+                session.executeAsync(String.format("SELECT * FROM %s.%s WHERE %s %s %s allow filtering;", KEY_SPACE, TABLE,
                         statement.getRequestModel().getColumn().getName(), getExpression(statement.getStatementExpresion()),
                         addSingleQuotes(statement.getValue().toString(), statement.getRequestModel().getColumn().getType())));
         return DBResponse.builder()
                 .dbName(DB.valueOf(getDataBase()).getDb())
-                .numberOfEntities(result.all().size())
+                .numberOfEntities(result.get().all().size())
                 .responseTime(System.currentTimeMillis() - time).build();
     }
 
@@ -126,7 +128,7 @@ public class CassandraDao implements RepositoryService {
     private void executeBatch(List<List<EntityModel>> entities, PreparedStatement preparedInsertExpense) {
         BatchStatement batchStatement = new BatchStatement(BatchStatement.Type.LOGGED);
         entities.forEach(entity -> batchStatement.add(preparedInsertExpense.bind(convertToList(entity))));
-        session.execute(batchStatement);
+        session.executeAsync(batchStatement);
     }
 
     public void batches(List<List<EntityModel>> entities, int length, PreparedStatement preparedInsertExpense) {

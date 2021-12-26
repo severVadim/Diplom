@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.diplom.util.EntityBuilder.addSingleQuotes;
+
 @Component
 public class PostgresDbDao implements RepositoryService {
 
@@ -91,14 +93,42 @@ public class PostgresDbDao implements RepositoryService {
         return DB.POSTGRES.name();
     }
 
+    @SneakyThrows
     @Override
     public DBResponse getWithLimit(Integer limit) {
-        return null;
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_READ_ONLY);
+        long time = System.currentTimeMillis();
+        ResultSet resultSet = statement.executeQuery(String.format("SELECT * FROM %s LIMIT %s;", TABLE, limit));
+        int size = 0;
+        while (resultSet.next()){
+            size++;
+        }
+
+        return DBResponse.builder()
+                .dbName(DB.valueOf(getDataBase()).getDb())
+                .numberOfEntities(size)
+                .responseTime(System.currentTimeMillis() - time).build();
     }
 
+    @SneakyThrows
     @Override
-    public DBResponse getWithStatement(StatementModel statement) {
-        return null;
+    public DBResponse getWithStatement(StatementModel statementModel) {
+        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+                ResultSet.CONCUR_READ_ONLY);
+        long time = System.currentTimeMillis();
+        ResultSet result =
+                statement.executeQuery(String.format("SELECT * FROM %s WHERE %s %s %s;", TABLE,
+                        statementModel.getRequestModel().getColumn().getName(), getExpression(statementModel.getStatementExpresion()),
+                        addSingleQuotes(statementModel.getValue().toString(), statementModel.getRequestModel().getColumn().getType())));
+        int size = 0;
+        while (result.next()){
+            size++;
+        }
+        return DBResponse.builder()
+                .dbName(DB.valueOf(getDataBase()).getDb())
+                .numberOfEntities(size)
+                .responseTime(System.currentTimeMillis() - time).build();
     }
 
     @Override

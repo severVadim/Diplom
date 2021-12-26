@@ -48,6 +48,11 @@ services:
     ports:
       - 27017:27017
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '8G'
 
   postgres:
     image: postgres:13.3
@@ -57,3 +62,8 @@ services:
       POSTGRES_PASSWORD: "postgres"
     ports:
       - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: '8G'
